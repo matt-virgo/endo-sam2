@@ -50,6 +50,11 @@ ADD https://dl.fbaipublicfiles.com/segment_anything_2/092824/sam2.1_hiera_small.
 ADD https://dl.fbaipublicfiles.com/segment_anything_2/092824/sam2.1_hiera_base_plus.pt ${APP_ROOT}/checkpoints/sam2.1_hiera_base_plus.pt
 ADD https://dl.fbaipublicfiles.com/segment_anything_2/092824/sam2.1_hiera_large.pt ${APP_ROOT}/checkpoints/sam2.1_hiera_large.pt
 
+# Create SSL directory and copy certificates for Gunicorn
+RUN mkdir -p ${APP_ROOT}/ssl
+COPY demo/frontend/ssl/nginx-selfsigned.crt ${APP_ROOT}/ssl/nginx-selfsigned.crt
+COPY demo/frontend/ssl/nginx-selfsigned.key ${APP_ROOT}/ssl/nginx-selfsigned.key
+
 WORKDIR ${APP_ROOT}/server
 
 # https://pythonspeed.com/articles/gunicorn-in-docker/
@@ -61,4 +66,6 @@ CMD gunicorn --worker-tmp-dir /dev/shm \
     --workers ${GUNICORN_WORKERS} \
     --threads ${GUNICORN_THREADS} \
     --bind 0.0.0.0:${GUNICORN_PORT} \
+    --certfile=${APP_ROOT}/ssl/nginx-selfsigned.crt \
+    --keyfile=${APP_ROOT}/ssl/nginx-selfsigned.key \
     --timeout 60
