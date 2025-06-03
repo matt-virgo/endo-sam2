@@ -5,7 +5,8 @@ services:
       context: ./demo/frontend
       dockerfile: frontend.Dockerfile
     ports:
-      - 7262:80
+      - "7262:443" # HTTPS
+      # - "80:80" # Optional: HTTP redirect
 
   backend:
     image: sam2/backend
@@ -13,7 +14,7 @@ services:
       context: .
       dockerfile: backend.Dockerfile
     ports:
-      - 7263:5000
+      - "7263:5000"
     volumes:
       - ./demo/data/:/data/:rw
     environment:
